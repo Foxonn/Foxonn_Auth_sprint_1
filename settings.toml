@@ -1,0 +1,7 @@
+orders_plugin = [
+    "flask_app_plugin",
+    "db"
+]
+
+[plugins.db]
+dsn = '@format postgresql://{env[AUTH_POSTGRES_USER]}:{env[AUTH_POSTGRES_PASS]}@{env[AUTH_POSTGRES_HOST]}:{env[AUTH_POSTGRES_PORT]}/{env[AUTH_POSTGRES_DB]}'

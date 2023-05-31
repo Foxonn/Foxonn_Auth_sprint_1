@@ -1,4 +1,7 @@
+from typing import Any
 from typing import Dict
+from typing import List
+from typing import Mapping
 from typing import Type
 
 from .IPlugin import IPlugin
@@ -15,7 +18,7 @@ class IPluginsManager:
     def add(self, plugin: IPlugin) -> None:
         raise NotImplementedError()
 
-    async def loads(self) -> None:
+    async def loads(self, plugins_settings: Mapping[str, Any], orders: List[str]) -> None:
         """
         Loads all plugins
         """

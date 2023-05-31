@@ -8,6 +8,6 @@ __all__ = [
 
 
 def loads_plugins(path_to_plugins: str) -> None:
-    for file in glob.glob(f'{path_to_plugins}/*_plugin.py'):
-        module_name = Path(file).name.strip('.py')
+    for file in glob.glob(f'{path_to_plugins}/*/*_plugin.py'):
+        module_name = Path(file).name[:-3]
         SourceFileLoader(module_name, file).load_module()
