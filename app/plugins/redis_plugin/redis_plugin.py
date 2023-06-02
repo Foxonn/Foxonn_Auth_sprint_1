@@ -1,39 +1,33 @@
 from typing import Any
 from typing import Mapping
 
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from aioredis import Redis
 from pydantic import BaseModel
 
 from app.utils.ioc import ioc
 from app.utils.plugins_manager import IPlugin
-from app.utils.plugins_manager import plugins_manager
 
-__all__ = ['FlaskAppPlugin']
+__all__ = ['RedisPlugin']
 
 
 class PluginsSettings(BaseModel):
-    dns: str
+    host: str
+    port: int
+    db: int
 
 
-class FlaskAppPlugin(IPlugin):
-    __slots__ = ()
-
+class RedisPlugin(IPlugin):
     @property
     def name(self) -> str:
-        return 'flask_app'
+        return 'redis'
 
     async def load(self, plugins_settings: Mapping[str, Any] | None = None) -> None:
-        app = Flask(__name__)
-        db = SQLAlchemy()
-        ioc.set(Flask, app)
-        ioc.set(SQLAlchemy, db)
+        settings = PluginsSettings(**plugins_settings)
+        redis_db = Redis(host=settings.host, port=settings.port, db=settings.db)
+        ioc.set(Redis, redis_db)
 
     async def reload(self) -> None:
         pass
 
     async def unload(self) -> None:
         pass
-
-
-plugins_manager.add(FlaskAppPlugin())

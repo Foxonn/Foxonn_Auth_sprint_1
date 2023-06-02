@@ -1,7 +1,14 @@
 orders_plugin = [
-    "flask_app_plugin",
+    "flask_app",
+    "redis",
     "db"
 ]
+
+[plugins.redis]
+host = 'localhost'
+port = 6379
+db = 1
+
 
 [plugins.db]
 dsn = '@format postgresql://{env[AUTH_POSTGRES_USER]}:{env[AUTH_POSTGRES_PASS]}@{env[AUTH_POSTGRES_HOST]}:{env[AUTH_POSTGRES_PORT]}/{env[AUTH_POSTGRES_DB]}'

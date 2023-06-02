@@ -53,9 +53,9 @@ class PluginsManager(IPluginsManager):
         for plugin_name in list(list_name_plugins_load)[::-1]:
             plugin = self.__plugins_store[plugin_name]
             if settings := plugins_settings.get(plugin.name, None):
-                asyncio.create_task(plugin.load(settings))
+                await plugin.load(settings)
             else:
-                asyncio.create_task(plugin.load())
+                await plugin.load()
             logging.debug(f'Plugin: `{plugin.name}` started to load.')
 
     async def unloads(self) -> None:
