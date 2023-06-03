@@ -5,7 +5,7 @@ from aioredis import Redis
 from pydantic import BaseModel
 
 from app.utils.ioc import ioc
-from app.utils.plugins_manager import IPlugin
+from app.utils.plugins_manager import IPlugin, plugins_manager
 
 __all__ = ['RedisPlugin']
 
@@ -31,3 +31,6 @@ class RedisPlugin(IPlugin):
 
     async def unload(self) -> None:
         pass
+
+
+plugins_manager.add(RedisPlugin())

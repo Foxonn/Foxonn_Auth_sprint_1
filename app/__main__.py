@@ -1,9 +1,11 @@
 import asyncio
 
 from dynaconf import Dynaconf
+from flask import Flask
 
 from app import PLUGINS_DIR
 from app import PROJECT_DIR
+from app.utils.ioc import ioc
 from app.utils.plugins_manager.impl import plugins_manager
 from app.utils.plugins_manager.utils import loads_plugins
 
@@ -18,6 +20,12 @@ async def main():
     )
     loads_plugins(path_to_plugins=PLUGINS_DIR)
     await plugins_manager.loads(plugins_settings=settings.plugins, orders=settings.orders_plugin)
+    app = ioc.get(Flask)
+    app.run(
+        host='0.0.0.0',
+        port=8080,
+        debug=True,
+    )
 
 
 loop = asyncio.get_event_loop()

@@ -1,7 +1,8 @@
 orders_plugin = [
+    "app",
     "flask_app",
     "redis",
-    "db"
+    "pony_db",
 ]
 
 [plugins.redis]
@@ -10,5 +11,13 @@ port = 6379
 db = 1
 
 
-[plugins.db]
-dsn = '@format postgresql://{env[AUTH_POSTGRES_USER]}:{env[AUTH_POSTGRES_PASS]}@{env[AUTH_POSTGRES_HOST]}:{env[AUTH_POSTGRES_PORT]}/{env[AUTH_POSTGRES_DB]}'
+#[plugins.db]
+#dsn = '@format postgresql://{env[AUTH_POSTGRES_USER]}:{env[AUTH_POSTGRES_PASS]}@{env[AUTH_POSTGRES_HOST]}:{env[AUTH_POSTGRES_PORT]}/{env[AUTH_POSTGRES_DB]}'
+
+[plugins.pony_db]
+debug = 'False'
+user = '@format {env[AUTH_POSTGRES_USER]}'
+password = '@format {env[AUTH_POSTGRES_PASS]}'
+port = '@format {env[AUTH_POSTGRES_PORT]}'
+host = '@format {env[AUTH_POSTGRES_HOST]}'
+database = '@format {env[AUTH_POSTGRES_DB]}'

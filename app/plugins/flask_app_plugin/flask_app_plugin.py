@@ -1,13 +1,12 @@
-from typing import Any
-from typing import Mapping
+from typing import Any, Mapping
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from pydantic import BaseModel
 
+from app.plugins.flask_app_plugin.api.v1.views import init_views
 from app.utils.ioc import ioc
-from app.utils.plugins_manager import IPlugin
-from app.utils.plugins_manager import plugins_manager
+from app.utils.plugins_manager import IPlugin, plugins_manager
 
 __all__ = ['FlaskAppPlugin']
 
@@ -26,8 +25,11 @@ class FlaskAppPlugin(IPlugin):
     async def load(self, plugins_settings: Mapping[str, Any] | None = None) -> None:
         app = Flask(__name__)
         db = SQLAlchemy()
+
         ioc.set(Flask, app)
         ioc.set(SQLAlchemy, db)
+
+        init_views(app=app)
 
     async def reload(self) -> None:
         pass

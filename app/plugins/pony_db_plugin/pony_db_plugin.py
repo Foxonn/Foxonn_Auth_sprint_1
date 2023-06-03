@@ -1,11 +1,9 @@
-from typing import Any
-from typing import Mapping
+from typing import Any, Mapping
 
-from pony.orm import Database
 from pony.orm import set_sql_debug
 from pydantic import BaseModel
 
-from app.utils.ioc import ioc
+from app.plugins.pony_db_plugin.models import db
 from app.utils.plugins_manager import IPlugin
 from app.utils.plugins_manager.impl import plugins_manager
 
@@ -18,6 +16,7 @@ class PluginsSettingsModel(BaseModel):
     port: str
     host: str
     database: str
+    debug: bool
 
 
 class PonyDBPlugin(IPlugin):
@@ -31,10 +30,9 @@ class PonyDBPlugin(IPlugin):
         return 'pony_db'
 
     async def load(self, plugins_settings: Mapping[str, Any] | None = None) -> None:
-        set_sql_debug(True)
         config = PluginsSettingsModel(**plugins_settings)
-        db = Database()
-        ioc.set(Database, db)
+        set_sql_debug(debug=config.debug)
+
         db.bind(
             provider='postgres', user=config.user, password=config.password,
             port=config.port, host=config.host, database=config.database,
