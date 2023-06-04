@@ -1,8 +1,8 @@
 orders_plugin = [
+    "pony_db",
     "app",
     "flask_app",
     "redis",
-    "pony_db",
 ]
 
 [plugins.redis]
@@ -10,6 +10,10 @@ host = 'localhost'
 port = 6379
 db = 1
 
+[plugins.flask_app]
+jwt_secret_key = '@format {env[JWT_SECRET_KEY]}'
+jwt_refresh_token_expires = '@format {env[JWT_REFRESH_TOKEN_EXPIRES]}'
+jwt_access_token_expires = '@format {env[JWT_ACCESS_TOKEN_EXPIRES]}'
 
 #[plugins.db]
 #dsn = '@format postgresql://{env[AUTH_POSTGRES_USER]}:{env[AUTH_POSTGRES_PASS]}@{env[AUTH_POSTGRES_HOST]}:{env[AUTH_POSTGRES_PORT]}/{env[AUTH_POSTGRES_DB]}'

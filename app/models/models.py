@@ -2,7 +2,8 @@ from pydantic import BaseModel
 
 __all__ = [
     'LoginResponseModel',
-    'RegistrationRequestModel'
+    'RegistrationRequestModel',
+    'LoginRequestModel',
 ]
 
 
@@ -12,5 +13,10 @@ class LoginResponseModel(BaseModel):
 
 
 class RegistrationRequestModel(BaseModel):
+    login: str
+    password: str
+
+
+class LoginRequestModel(RegistrationRequestModel):
     login: str
     password: str

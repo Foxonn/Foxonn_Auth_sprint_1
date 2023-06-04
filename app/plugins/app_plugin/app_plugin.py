@@ -1,7 +1,9 @@
 from typing import Any, Mapping
 
-from app.functions.commands.impl import CreateUser
-from app.functions.commands.interfaces import ICreateUser
+from app.functions.commands.impl import CreateHistoryLogin, CreateUser
+from app.functions.commands.interfaces import ICreateHistoryLogin, ICreateUser
+from app.functions.query.impl import IdentificationUser
+from app.functions.query.interfaces import IIdentificationUser
 from app.utils.ioc import ioc
 from app.utils.plugins_manager import IPlugin, plugins_manager
 
@@ -15,6 +17,8 @@ class AppPlugin(IPlugin):
 
     async def load(self, plugins_settings: Mapping[str, Any] | None = None) -> None:
         ioc.set(ICreateUser, CreateUser())
+        ioc.set(IIdentificationUser, IdentificationUser())
+        ioc.set(ICreateHistoryLogin, CreateHistoryLogin())
 
     async def reload(self) -> None:
         pass

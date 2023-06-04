@@ -43,14 +43,16 @@ class PluginsManager(IPluginsManager):
 
     async def loads(self, orders: List[str], plugins_settings: Mapping[str, Any] = {}) -> None:
         set_orders = set(orders)
-        plugins_names = self.__plugins_store.keys()
+        plugins_names = list(self.__plugins_store.keys())[::-1]
 
         if diff := set_orders.difference(plugins_names):
             logging.warning(f'Plugin: {diff}, not found in list plugin loads.')
 
         list_name_plugins_load = set_orders.intersection(plugins_names)
 
-        for plugin_name in list(list_name_plugins_load)[::-1]:
+        for plugin_name in orders:
+            if plugin_name not in list_name_plugins_load:
+                continue
             plugin = self.__plugins_store[plugin_name]
             if settings := plugins_settings.get(plugin.name, None):
                 await plugin.load(settings)

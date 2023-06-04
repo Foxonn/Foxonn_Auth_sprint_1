@@ -1,10 +1,14 @@
 from typing import Any, Mapping
 
 import orjson
-from flask import Flask, make_response, request, Response
+from flask import Flask, request, Response
+from flask_jwt_extended import create_access_token, create_refresh_token
+from pony.orm import db_session
 
-from app.functions.commands.interfaces import ICreateUser
-from app.models import RegistrationRequestModel
+from app.exceptions import UserNotFoundError
+from app.functions.commands.interfaces import ICreateHistoryLogin, ICreateUser
+from app.functions.query.interfaces import IIdentificationUser
+from app.models import LoginRequestModel, RegistrationRequestModel
 from app.plugins.flask_app_plugin.utils import make_json_response
 from app.utils.ioc import ioc
 
@@ -25,8 +29,28 @@ def init_views(app: Flask) -> None:
         return make_json_response(response='', status=200)
 
     @app.route('/login', methods=["POST"])
-    async def login() -> Mapping[str, Any]:
-        ...
+    async def login() -> Response:
+        identification_user = ioc.get(IIdentificationUser)
+        create_history_login = ioc.get(ICreateHistoryLogin)
+        data = LoginRequestModel(**request.args)
+
+        with db_session:
+            try:
+                user = await identification_user(**data.dict())
+            except UserNotFoundError as err:
+                return make_json_response(response=str(err), status=404)
+            else:
+                access_token = create_access_token(identity=str(user.id))
+                refresh_token = create_refresh_token(identity=str(user.id))
+                await create_history_login(content=request.headers['User-Agent'], user=user)
+
+                return make_json_response(
+                    response=orjson.dumps({
+                        'access_token': access_token,
+                        'refresh_token': refresh_token,
+                    }),
+                    status=200,
+                )
 
     @app.route('/logout', methods=["POST"])
     async def logout() -> Mapping[str, Any]:
