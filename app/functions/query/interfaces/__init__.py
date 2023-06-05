@@ -1,1 +1,2 @@
 from .IIdentificationUser import IIdentificationUser
+from .IGetHistoryLogin import IGetHistoryLogin
