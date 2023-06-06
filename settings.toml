@@ -6,17 +6,14 @@ orders_plugin = [
 ]
 
 [plugins.redis]
-host = 'localhost'
-port = 6379
-db = 1
+host = '@format {env[AUTH_REDIS_HOST]}'
+port = '@format {env[AUTH_REDIS_PORT]}'
+db = '@format {env[AUTH_REDIS_DB]}'
 
-[plugins.flask_app]
-jwt_secret_key = '@format {env[JWT_SECRET_KEY]}'
-jwt_refresh_token_expires = '@format {env[JWT_REFRESH_TOKEN_EXPIRES]}'
-jwt_access_token_expires = '@format {env[JWT_ACCESS_TOKEN_EXPIRES]}'
-
-#[plugins.db]
-#dsn = '@format postgresql://{env[AUTH_POSTGRES_USER]}:{env[AUTH_POSTGRES_PASS]}@{env[AUTH_POSTGRES_HOST]}:{env[AUTH_POSTGRES_PORT]}/{env[AUTH_POSTGRES_DB]}'
+[plugins.jwt_token]
+jwt_secret_key = '@format {env[AUTH_JWT_SECRET_KEY]}'
+jwt_refresh_token_expires = '@format {env[AUTH_JWT_REFRESH_TOKEN_EXPIRES]}'
+jwt_access_token_expires = '@format {env[AUTH_JWT_ACCESS_TOKEN_EXPIRES]}'
 
 [plugins.pony_db]
 debug = 'False'

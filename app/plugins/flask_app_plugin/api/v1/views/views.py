@@ -2,7 +2,6 @@ from typing import Any, Mapping
 
 import orjson
 from flask import Flask, request, Response
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
 from pony.orm import db_session
 
 from app.exceptions import UserNotFoundError
@@ -41,7 +40,7 @@ def init_views(app: Flask) -> None:
             except UserNotFoundError as err:
                 return make_json_response(response=str(err), status=404)
             else:
-                access_token = create_access_token(identity=identity)
+                access_token = create_access_token(identity=identity, fresh=True)
                 refresh_token = create_refresh_token(identity=identity)
                 await create_history_login(content=request.headers['User-Agent'], user=user)
 
@@ -53,6 +52,15 @@ def init_views(app: Flask) -> None:
                     status=200,
                 )
 
+    @app.route('/refresh', methods=["GET"])
+    async def refresh() -> Response:
+        current_user = get_jwt_identity()
+        new_token = create_access_token(identity=current_user, fresh=False)
+        return make_json_response(
+            response=orjson.dumps(new_token),
+            status=200,
+        )
+
     @app.route('/logout', methods=["POST"])
     async def logout() -> Mapping[str, Any]:
         ...
@@ -62,7 +70,6 @@ def init_views(app: Flask) -> None:
         ...
 
     @app.route('/history_login', methods=["GET"])
-    @jwt_required()
     async def history_login() -> Response:
         get_history_login = ioc.get(IGetHistoryLogin)
         raw_jwt_identity = get_jwt_identity()

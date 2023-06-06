@@ -3,6 +3,7 @@ from typing import Any, Mapping
 from pony.orm import Database, set_sql_debug
 from pydantic import BaseModel
 
+from app.functions.commands.interfaces import ICreateUser
 from app.plugins.pony_db_plugin.models import db
 from app.utils.ioc import ioc
 from app.utils.plugins_manager import IPlugin
@@ -33,7 +34,6 @@ class PonyDBPlugin(IPlugin):
     async def load(self, plugins_settings: Mapping[str, Any] | None = None) -> None:
         config = PluginsSettingsModel(**plugins_settings)
         set_sql_debug(debug=config.debug)
-
         db.bind(
             provider='postgres', user=config.user, password=config.password,
             port=config.port, host=config.host, database=config.database,
