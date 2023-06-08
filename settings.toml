@@ -1,6 +1,7 @@
 orders_plugin = [
     "pony_db",
     "app",
+    "jwt_token",
     "flask_app",
     "redis",
 ]
