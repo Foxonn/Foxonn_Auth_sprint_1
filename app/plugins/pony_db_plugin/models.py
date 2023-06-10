@@ -1,7 +1,11 @@
 import datetime
 import uuid
 
-from pony.orm import Database, PrimaryKey, Required, Optional, Set
+from pony.orm import Database
+from pony.orm import Optional
+from pony.orm import PrimaryKey
+from pony.orm import Required
+from pony.orm import Set
 
 __all__ = [
     'db',
@@ -28,5 +32,5 @@ class User(db.Entity):
 class HistoryLogin(db.Entity):
     id = PrimaryKey(uuid.UUID, default=uuid.uuid4, nullable=False)
     user = Required(User)
-    content = Required(str, nullable=False)
+    fingerprint = Required(bytes, nullable=False)
     created_at = Optional(datetime.datetime)

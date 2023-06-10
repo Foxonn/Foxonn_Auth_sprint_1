@@ -1,4 +1,5 @@
 orders_plugin = [
+    "session_storage",
     "pony_db",
     "app",
     "jwt_token",
@@ -12,9 +13,9 @@ port = '@format {env[AUTH_REDIS_PORT]}'
 db = '@format {env[AUTH_REDIS_DB]}'
 
 [plugins.jwt_token]
-jwt_secret_key = '@format {env[AUTH_JWT_SECRET_KEY]}'
-jwt_refresh_token_expires = '@format {env[AUTH_JWT_REFRESH_TOKEN_EXPIRES]}'
-jwt_access_token_expires = '@format {env[AUTH_JWT_ACCESS_TOKEN_EXPIRES]}'
+secret_key = '@format {env[AUTH_JWT_SECRET_KEY]}'
+refresh_token_expires = '@format {env[AUTH_JWT_REFRESH_TOKEN_EXPIRES]}'
+access_token_expires = '@format {env[AUTH_JWT_ACCESS_TOKEN_EXPIRES]}'
 
 [plugins.pony_db]
 debug = 'False'
@@ -23,3 +24,9 @@ password = '@format {env[AUTH_POSTGRES_PASS]}'
 port = '@format {env[AUTH_POSTGRES_PORT]}'
 host = '@format {env[AUTH_POSTGRES_HOST]}'
 database = '@format {env[AUTH_POSTGRES_DB]}'
+
+[plugins.flask_app]
+fingerprint_secret_key = '@format {env[AUTH_APP_FINGERPRINT_SECRET_KEY]}'
+
+[plugins.session_storage]
+type_storage = '@format {env[AUTH_SESSION_STORAGE_TYPE_STORAGE]}'

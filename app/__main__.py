@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from dynaconf import Dynaconf
 from flask import Flask
@@ -8,6 +9,12 @@ from app import PROJECT_DIR
 from app.utils.ioc import ioc
 from app.utils.plugins_manager.impl import plugins_manager
 from app.utils.plugins_manager.utils import loads_plugins
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s",
+    datefmt="%d/%b/%Y %H:%M:%S",
+)
 
 
 async def main():
@@ -20,12 +27,9 @@ async def main():
     )
     loads_plugins(path_to_plugins=PLUGINS_DIR)
     await plugins_manager.loads(plugins_settings=settings.plugins, orders=settings.orders_plugin)
-    app = ioc.get(Flask)
-    app.run(
-        host='0.0.0.0',
-        port=8080,
-        debug=True,
-    )
+    get_app = ioc.get_object(object_type=Flask)
+    app = get_app()
+    app.run(host='0.0.0.0', port=8080, debug=True)
 
 
 loop = asyncio.get_event_loop()

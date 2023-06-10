@@ -1,2 +1,2 @@
-from .IdentificationUser import IdentificationUser
-from .GetHistoryLogin import GetHistoryLogin
+from .GetHistoryLoginQuery import GetHistoryLoginQuery
+from .IdentificationUserQuery import IdentificationUserQuery

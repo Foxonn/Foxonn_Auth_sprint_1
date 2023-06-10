@@ -1,3 +1,3 @@
-from .CreateAccessTokenCmd import CreateAccessTokenCmdCmd
+from .CreateAccessTokenCmd import CreateAccessTokenCmd
 from .CreateRefreshTokenCmd import CreateRefreshTokenCmd
 from .DecodeJWTTokenCmd import DecodeJWTTokenCmd
