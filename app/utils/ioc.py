@@ -1,11 +1,11 @@
-from typing import Any, Mapping, Type, TypeVar
+import typing as t
 
 __all__ = [
     'IOC',
     'ioc',
 ]
 
-T = TypeVar("T")
+T = t.TypeVar("T")
 
 
 class IOC:
@@ -16,13 +16,13 @@ class IOC:
     def __init__(self) -> None:
         self.__store = dict()
 
-    def get_store(self) -> Mapping[str, Any]:
+    def get_store(self) -> t.Mapping[str, t.Any]:
         return self.__store
 
-    def set(self, key: Type[T], value: T) -> None:
+    def set(self, key: t.Type[T], value: T) -> None:
         self.__store[key] = value
 
-    def get(self, key: Type[T]) -> T | None:
+    def get(self, key: t.Type[T]) -> T | None:
         return self.__store[key]
 
 

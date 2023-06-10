@@ -1,10 +1,7 @@
 import asyncio
 import logging
 from collections import UserDict
-from typing import Any
-from typing import ItemsView
-from typing import List
-from typing import Mapping
+import typing as t
 
 from ..interfaces import IPlugin
 from ..interfaces import IPluginsManager
@@ -32,7 +29,7 @@ class PluginsManager(IPluginsManager):
     def __init__(self) -> None:
         self.__plugins_store = PluginsStore()
 
-    def list(self) -> ItemsView[str, IPlugin]:
+    def list(self) -> t.ItemsView[str, IPlugin]:
         return self.__plugins_store.items()
 
     def add(self, plugin: IPlugin) -> None:
@@ -41,7 +38,7 @@ class PluginsManager(IPluginsManager):
     def get(self, plugin_name: str) -> IPlugin:
         return self.__plugins_store[plugin_name]
 
-    async def loads(self, orders: List[str], plugins_settings: Mapping[str, Any] = {}) -> None:
+    async def loads(self, orders: t.List[str], plugins_settings: t.Mapping[str, t.Any] = {}) -> None:
         set_orders = set(orders)
         plugins_names = list(self.__plugins_store.keys())[::-1]
 

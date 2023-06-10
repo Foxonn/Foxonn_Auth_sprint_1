@@ -1,4 +1,4 @@
-from pony.orm import Database, db_session
+from pony.orm import db_session
 
 from app.exceptions import UserNotFoundError
 from app.functions.query.interfaces import IIdentificationUser

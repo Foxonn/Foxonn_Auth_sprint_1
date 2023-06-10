@@ -1,19 +1,19 @@
-from typing import Any, Mapping
+import typing as t
 
+from cryptography.fernet import Fernet
 from flask import Flask
 from pydantic import BaseModel
 
 from app.plugins.flask_app_plugin.api.v1.views import init_views
 from app.utils.ioc import ioc
-from app.utils.plugins_manager import IPlugin, plugins_manager
+from app.utils.plugins_manager import IPlugin
+from app.utils.plugins_manager import plugins_manager
 
 __all__ = ['FlaskAppPlugin']
 
 
 class PluginsSettings(BaseModel):
-    jwt_secret_key: str
-    jwt_access_token_expires: int
-    jwt_refresh_token_expires: int
+    fingerprint_secret_key: str
 
 
 class FlaskAppPlugin(IPlugin):
@@ -23,10 +23,13 @@ class FlaskAppPlugin(IPlugin):
     def name(self) -> str:
         return 'flask_app'
 
-    async def load(self, plugins_settings: Mapping[str, Any] | None = None) -> None:
+    async def load(self, plugins_settings: t.Mapping[str, t.Any] | None = None) -> None:
+        plugin_config = PluginsSettings(**plugins_settings)
         app = Flask(__name__)
+        fernet = Fernet(key=plugin_config.fingerprint_secret_key)
 
         ioc.set(Flask, app)
+        ioc.set(Fernet, fernet)
         init_views(app=app)
 
     async def reload(self) -> None:

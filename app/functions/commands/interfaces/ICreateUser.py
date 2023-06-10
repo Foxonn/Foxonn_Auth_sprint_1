@@ -1,4 +1,4 @@
-from typing import Any, Mapping
+import typing as t
 
 __all__ = ['ICreateUser']
 
@@ -6,5 +6,5 @@ __all__ = ['ICreateUser']
 class ICreateUser:
     __slots__ = ()
 
-    async def __call__(self, data: Mapping[str, Any]) -> None:
+    async def __call__(self, data: t.Mapping[str, t.Any]) -> None:
         raise NotImplementedError()

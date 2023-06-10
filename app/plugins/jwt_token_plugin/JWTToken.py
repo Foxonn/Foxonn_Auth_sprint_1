@@ -1,7 +1,9 @@
-from datetime import datetime
-from typing import Any, Dict
+import datetime
+import typing as t
 
 import jwt
+
+from app.plugins.jwt_token_plugin.models import JWTTokenModels
 
 __all__ = ['JWTToken']
 
@@ -22,19 +24,16 @@ class JWTToken:
         self._key = key
         self._algorithm = algorithm
 
-    @property
-    def __utcnow_timestamp(self) -> int:
-        return int(datetime.utcnow().strftime('%s'))
-
-    def _calculate_token_expired(self, expire: int) -> int:
-        time_expiration_token = datetime.fromtimestamp(self.__utcnow_timestamp + expire)
-        return int(time_expiration_token.strftime('%s'))
-
-    def encode(self, payload: Dict[str, Any], token_expires: int, headers: Dict[str, Any] | None = None) -> str:
-        date_expired_access_token = self._calculate_token_expired(expire=token_expires)
-        payload.update({'expired': date_expired_access_token})
+    def encode(
+        self,
+        payload: t.Dict[str, t.Any],
+        token_expires: int,
+        headers: t.Dict[str, t.Any] | None = None,
+    ) -> JWTTokenModels:
+        date_expired_access_token = datetime.datetime.utcnow() + datetime.timedelta(seconds=token_expires)
+        payload.update({'exp': date_expired_access_token})
         encode = jwt.encode(payload=payload, key=self._key, headers=headers, algorithm=self._algorithm)
-        return encode
+        return JWTTokenModels(token=encode, payload=payload)
 
-    def decode(self, jwt_encoded: str) -> Dict[str, Any]:
+    def decode(self, jwt_encoded: str) -> t.Dict[str, t.Any]:
         return jwt.decode(jwt=jwt_encoded, key=self._key, algorithms=self._algorithm)
