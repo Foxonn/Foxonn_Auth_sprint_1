@@ -1,2 +1,2 @@
-from .ICreateHistoryLogin import ICreateHistoryLogin
-from .ICreateUser import ICreateUser
+from .ICreateHistoryLoginCmd import ICreateHistoryLoginCmd
+from .ICreateUserCmd import ICreateUserCmd

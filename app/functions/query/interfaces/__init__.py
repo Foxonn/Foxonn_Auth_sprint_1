@@ -1,2 +1,2 @@
-from .IGetHistoryLogin import IGetHistoryLogin
-from .IIdentificationUser import IIdentificationUser
+from .IGetHistoryLoginQuery import IGetHistoryLoginQuery
+from .IIdentificationUserQuery import IIdentificationUserQuery

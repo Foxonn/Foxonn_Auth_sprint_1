@@ -2,14 +2,14 @@ import typing as t
 
 from pony.orm import db_session
 
-from app.functions.query.interfaces import IGetHistoryLogin
+from app.functions.query.interfaces import IGetHistoryLoginQuery
 from app.plugins.flask_app_plugin.utils.fingerprint import fingerprint_decode
 from app.plugins.pony_db_plugin.models import HistoryLogin
 
-__all__ = ['GetHistoryLogin']
+__all__ = ['GetHistoryLoginQuery']
 
 
-class GetHistoryLogin(IGetHistoryLogin):
+class GetHistoryLoginQuery(IGetHistoryLoginQuery):
     __slots__ = ()
 
     async def __call__(self, user_id: str) -> t.Sequence[t.Mapping[str, t.Any] | None]:

@@ -24,7 +24,7 @@ class RedisPlugin(IPlugin):
     async def load(self, plugins_settings: t.Mapping[str, t.Any] | None = None) -> None:
         settings = PluginsSettings(**plugins_settings)
         redis_db = Redis(host=settings.host, port=settings.port, db=settings.db)
-        ioc.set(Redis, redis_db)
+        ioc.set_object(object_type=Redis, object_=redis_db)
 
     async def reload(self) -> None:
         pass

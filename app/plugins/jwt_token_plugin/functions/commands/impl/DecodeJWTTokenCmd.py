@@ -1,7 +1,7 @@
+from app.models.jwt_token_models import JWTTokenModels
+from app.models.jwt_token_models import JWTTokenPayloadsModels
 from app.plugins.jwt_token_plugin import JWTToken
 from app.plugins.jwt_token_plugin.functions.commands.interfaces import IDecodeJWTTokenCmd
-from app.plugins.jwt_token_plugin.models import JWTTokenModels
-from app.plugins.jwt_token_plugin.models import JWTTokenPayloadsModels
 
 __all__ = ['DecodeJWTTokenCmd']
 

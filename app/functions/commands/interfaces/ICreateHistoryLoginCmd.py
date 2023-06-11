@@ -2,10 +2,10 @@ import typing as t
 
 from app.plugins.pony_db_plugin.models import User
 
-__all__ = ['ICreateHistoryLogin']
+__all__ = ['ICreateHistoryLoginCmd']
 
 
-class ICreateHistoryLogin:
+class ICreateHistoryLoginCmd:
     __slots__ = ()
 
     async def __call__(self, user: User, fingerprint: t.Any) -> None:

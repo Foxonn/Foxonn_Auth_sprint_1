@@ -1,4 +1,5 @@
 orders_plugin = [
+    "session_storage",
     "pony_db",
     "app",
     "jwt_token",

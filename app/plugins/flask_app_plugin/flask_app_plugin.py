@@ -28,8 +28,8 @@ class FlaskAppPlugin(IPlugin):
         app = Flask(__name__)
         fernet = Fernet(key=plugin_config.fingerprint_secret_key)
 
-        ioc.set(Flask, app)
-        ioc.set(Fernet, fernet)
+        ioc.set_object(object_type=Flask, object_=app)
+        ioc.set_object(object_type=Fernet, object_=fernet)
         init_views(app=app)
 
     async def reload(self) -> None:

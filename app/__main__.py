@@ -27,7 +27,8 @@ async def main():
     )
     loads_plugins(path_to_plugins=PLUGINS_DIR)
     await plugins_manager.loads(plugins_settings=settings.plugins, orders=settings.orders_plugin)
-    app = ioc.get(Flask)
+    get_app = ioc.get_object(object_type=Flask)
+    app = get_app()
     app.run(host='0.0.0.0', port=8080, debug=True)
 
 

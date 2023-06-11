@@ -1,13 +1,13 @@
 import datetime
 import typing as t
 
-from app.functions.commands.interfaces.ICreateUser import ICreateUser
+from app.functions.commands.interfaces.ICreateUserCmd import ICreateUserCmd
 from app.plugins.pony_db_plugin.models import User
 
-__all__ = ['CreateUser']
+__all__ = ['CreateUserCmd']
 
 
-class CreateUser(ICreateUser):
+class CreateUserCmd(ICreateUserCmd):
     __slots__ = ()
 
     async def __call__(self, data: t.Mapping[str, t.Any]) -> None:

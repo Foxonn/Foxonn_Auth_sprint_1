@@ -9,6 +9,8 @@ from app.utils.plugins_manager import IPlugin
 
 __all__ = ['SessionAuthStoragePlugin']
 
+from app.utils.plugins_manager import plugins_manager
+
 
 class PluginSettings(BaseModel):
     type_storage: str
@@ -23,10 +25,13 @@ class SessionAuthStoragePlugin(IPlugin):
 
     async def load(self, plugins_settings: t.Mapping[str, t.Any] | None = None) -> None:
         config_plugin = PluginSettings(**plugins_settings)
-        ioc.set(ISessionStorage,  MemorySessionStorage())
+        ioc.set_object(object_type=ISessionStorage,  object_=MemorySessionStorage())
 
     async def reload(self) -> None:
         pass
 
     async def unload(self) -> None:
         pass
+
+
+plugins_manager.add(SessionAuthStoragePlugin())

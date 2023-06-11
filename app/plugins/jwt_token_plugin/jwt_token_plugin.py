@@ -33,14 +33,14 @@ class JwtTokenPlugin(IPlugin):
         plugins_config = JWTTokenSettings(**plugins_settings)
         token = JWTToken(key=plugins_config.secret_key)
 
-        ioc.set(IDecodeJWTTokenCmd, DecodeJWTTokenCmd(jwt_token=token))
-        ioc.set(
-            ICreateAccessTokenCmd,
-            CreateAccessTokenCmd(jwt_token=token, token_expires=plugins_config.access_token_expires)
+        ioc.set_function(function_type=IDecodeJWTTokenCmd, function=DecodeJWTTokenCmd(jwt_token=token))
+        ioc.set_function(
+            function_type=ICreateAccessTokenCmd,
+            function=CreateAccessTokenCmd(jwt_token=token, token_expires=plugins_config.access_token_expires)
         )
-        ioc.set(
-            ICreateRefreshTokenCmd,
-            CreateRefreshTokenCmd(jwt_token=token, token_expires=plugins_config.refresh_token_expires)
+        ioc.set_function(
+            function_type=ICreateRefreshTokenCmd,
+            function=CreateRefreshTokenCmd(jwt_token=token, token_expires=plugins_config.refresh_token_expires)
         )
 
     async def reload(self) -> None:

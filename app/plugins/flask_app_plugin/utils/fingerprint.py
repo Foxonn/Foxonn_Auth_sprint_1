@@ -14,12 +14,12 @@ __all__ = [
 
 
 def fingerprint_encode() -> bytes:
-    fernet = ioc.get(Fernet)
+    fernet = ioc.get_object(object_type=Fernet)()
     return _fingerprint_encode(fernet=fernet, request=request)
 
 
 def fingerprint_decode(fingerprint: bytes) -> t.Dict[str, t.Any]:
-    fernet = ioc.get(Fernet)
+    fernet = ioc.get_object(object_type=Fernet)()
     return _fingerprint_decode(fernet=fernet, fingerprint=fingerprint)
 
 

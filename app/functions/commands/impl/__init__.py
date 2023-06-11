@@ -1,2 +1,2 @@
-from .CreateHistoryLogin import CreateHistoryLogin
-from .CreateUser import CreateUser
+from .CreateHistoryLoginCmd import CreateHistoryLoginCmd
+from .CreateUserCmd import CreateUserCmd
