@@ -15,7 +15,7 @@ from app.functions.query.interfaces import IIdentificationUserQuery
 from app.models.auth_models import LoginRequestModel
 from app.models.auth_models import RegistrationRequestModel
 from app.plugins.flask_app_plugin.utils.fingerprint import fingerprint_encode
-from app.plugins.flask_app_plugin.utils.identity_session import identity_session
+from app.plugins.flask_app_plugin.utils.get_token_session import get_token_session
 from app.plugins.flask_app_plugin.utils.make_json_response import make_json_response
 from app.plugins.flask_app_plugin.utils.required_auth import required_auth
 from app.plugins.jwt_token_plugin.functions.commands.interfaces import ICreateAccessTokenCmd
@@ -103,7 +103,7 @@ def init_views(app: Flask) -> None:
     @app.route('/history_login', methods=["GET"])
     @required_auth
     async def history_login() -> Response:
-        token = identity_session()
+        token = get_token_session()
         result = await get_history_login_query(user_id=token.payload.user_id)
         try:
             return make_json_response(response=orjson.dumps(result), status=200)
