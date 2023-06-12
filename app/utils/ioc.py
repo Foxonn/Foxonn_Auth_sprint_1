@@ -30,7 +30,7 @@ class IOC:
     def set_function(self, function_type: t.Type[T], function: T) -> None:
         self.__functions_store[function_type] = function.__call__
 
-    def get_function(self, function_type: t.Type[T]) -> t.Callable[[None], T]:
+    def get_function(self, function_type: t.Type[T]) -> T:
         function = self.__functions_store[function_type]
         return function
 

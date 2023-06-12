@@ -1,0 +1,14 @@
+###
+
+GET http://127.0.0.1:8080/history_login
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMWFmZDE3ZmQtYjZmNS00YTkzLTgxOTQtMTZkMjJiMmI1YmU3IiwiZmluZ2VycHJpbnQiOiJiJ2dBQUFBQUJraHY3WUlWY3daTk1QYXdoVFZGdzZfRHROUTVvTGJZNVc4LU1FbUljWGV0SlNRUzluX0VEdC1vM0cxUzJmZ3JJbXN1VHY3VEF1MHJUVy1TZnFpekNNVFVvdUxiRlFfXzdfM0JfR1pObS1vSFFnaWRTV1IyRFp4ay0yenh3bmttSDBNTzBwaF84QWVkMC10bUMxeVc0c3VhN21pdz09JyIsImV4cCI6MTY4NjU2ODc4NH0.E8XLegFUgK4YWtJvFVnCiVQLCi_TuXl6TkSkLrAXKk0
+
+###
+
+
+# curl --location --request POST 'http://127.0.0.1:8080/login?login=anton&password=qwerty123'
+POST http://127.0.0.1:8080/login?login=anton&password=qwerty123
+
+###
+
+

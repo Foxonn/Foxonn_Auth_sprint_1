@@ -8,12 +8,11 @@ from jwt import ExpiredSignatureError
 from pony.orm import db_session
 
 from app.exceptions import UserNotFoundError
-from app.functions.commands.interfaces import ICreateHistoryLoginCmd
 from app.functions.commands.interfaces import ICreateUserCmd
 from app.functions.query.interfaces import IGetHistoryLoginQuery
 from app.functions.query.interfaces import IIdentificationUserQuery
-from app.models.auth_models import LoginRequestModel
 from app.models.auth_models import RegistrationRequestModel
+from app.plugins.flask_app_plugin.events import LoginEvent
 from app.plugins.flask_app_plugin.utils.fingerprint import fingerprint_encode
 from app.plugins.flask_app_plugin.utils.get_token_session import get_token_session
 from app.plugins.flask_app_plugin.utils.make_json_response import make_json_response
@@ -23,6 +22,7 @@ from app.plugins.jwt_token_plugin.functions.commands.interfaces import ICreateRe
 from app.plugins.jwt_token_plugin.functions.commands.interfaces import IDecodeJWTTokenCmd
 from app.plugins.session_auth_storage_plugin.core import ISessionStorage
 from app.utils.ioc import ioc
+from app.utils.message_bus import message_bus
 
 __all__ = [
     'init_views',
@@ -34,13 +34,12 @@ def init_views(app: Flask) -> None:
     identification_user_query = ioc.get_function(function_type=IIdentificationUserQuery)
     create_access_token_cmd = ioc.get_function(function_type=ICreateAccessTokenCmd)
     create_refresh_token_cmd = ioc.get_function(function_type=ICreateRefreshTokenCmd)
-    create_history_login_cmd = ioc.get_function(function_type=ICreateHistoryLoginCmd)
     decode_jwt_token_cmd = ioc.get_function(function_type=IDecodeJWTTokenCmd)
     get_history_login_query = ioc.get_function(function_type=IGetHistoryLoginQuery)
 
     @app.route('/registration', methods=["POST"])
     async def registration() -> Response:
-        create_user = ioc.get(ICreateUserCmd)
+        create_user = ioc.get_function(function_type=ICreateUserCmd)
         data = RegistrationRequestModel(**request.args)
 
         try:
@@ -52,20 +51,23 @@ def init_views(app: Flask) -> None:
 
     @app.route('/login', methods=["POST"])
     async def login() -> Response:
-        data = LoginRequestModel(**request.args)
-
+        fingerprint = fingerprint_encode()
+        await message_bus.publish(
+            event=LoginEvent(
+                login=request.args['login'],
+                password=request.args['password'],
+                fingerprint=fingerprint,
+            ),
+        )
         with db_session:
             try:
-                user = await identification_user_query(**data.dict())
-                identity = {'user_id': str(user.id)}
+                user = await identification_user_query(**dict(request.args))
+                identity = {'user_id': str(user.id), 'fingerprint': str(fingerprint)}
             except UserNotFoundError as err:
                 return make_json_response(response=str(err), status=404)
             else:
                 access_token = create_access_token_cmd(payload=identity)
                 refresh_token = create_refresh_token_cmd(payload=identity)
-
-                fingerprint = fingerprint_encode()
-                await create_history_login_cmd(fingerprint=fingerprint, user=user)
                 session_storage.set(jwt_token=access_token)
 
                 return make_json_response(
@@ -88,6 +90,7 @@ def init_views(app: Flask) -> None:
             access_token = create_access_token_cmd(payload=token.payload.dict())
             refresh_token = create_refresh_token_cmd(payload=token.payload.dict())
 
+        session_storage.set(jwt_token=access_token)
         return make_json_response(
             response=orjson.dumps({
                 'access_token': access_token.token,

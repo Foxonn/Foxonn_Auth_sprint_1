@@ -11,6 +11,7 @@ __all__ = [
 
 class JWTTokenPayloadsModels(BaseModel):
     user_id: str
+    fingerprint: str
     exp: datetime.datetime
     roles: t.List[str] | None = None
 
