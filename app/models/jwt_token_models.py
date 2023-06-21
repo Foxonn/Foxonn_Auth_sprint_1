@@ -5,6 +5,8 @@ from pydantic import BaseModel
 
 __all__ = [
     'JWTTokenModels',
+    'JWTAccessTokenModels',
+    'JWTRefreshTokenModels',
     'JWTTokenPayloadsModels',
 ]
 
@@ -20,8 +22,10 @@ class JWTTokenModels(BaseModel):
     payload: JWTTokenPayloadsModels
     token: str
 
-    @property
-    def is_expired_token(self) -> bool:
-        if datetime.datetime.utcnow().timestamp() > self.payload.exp.timestamp():
-            return True
-        return False
+
+class JWTAccessTokenModels(JWTTokenModels):
+    pass
+
+
+class JWTRefreshTokenModels(JWTTokenModels):
+    pass

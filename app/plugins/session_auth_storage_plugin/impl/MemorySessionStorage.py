@@ -5,18 +5,26 @@ from app.plugins.session_auth_storage_plugin.core import ISessionStorage
 
 __all__ = ['MemorySessionStorage']
 
-_store = dict()
-
 
 class MemorySessionStorage(ISessionStorage):
-    __slots__ = ()
+    __slots__ = (
+        '_store'
+    )
 
     def __init__(self) -> None:
-        pass
+        self._store = dict()
 
     def set(self, jwt_token: JWTTokenModels) -> None:
-        _store[jwt_token.token] = orjson.dumps(jwt_token.dict())
+        self._store[jwt_token.token] = orjson.dumps(jwt_token.dict())
 
     def get(self, token: str) -> JWTTokenModels:
-        raw_data = orjson.loads(_store[token])
+        raw_data = orjson.loads(self._store[token])
         return JWTTokenModels(**raw_data)
+
+    def is_active_token(self, token: str) -> bool:
+        if token in self._store:
+            return True
+        return False
+
+    def revoke_token(self, token: str) -> None:
+        self._store.pop(token)

@@ -3,10 +3,9 @@ import typing as t
 
 import jwt
 
+from app.models.jwt_token_models import JWTTokenModels
 
 __all__ = ['JWTToken']
-
-from app.models.jwt_token_models import JWTTokenModels
 
 
 class JWTToken:

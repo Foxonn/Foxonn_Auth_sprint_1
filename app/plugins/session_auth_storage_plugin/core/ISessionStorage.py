@@ -11,3 +11,9 @@ class ISessionStorage:
 
     def get(self, token: str) -> JWTTokenModels:
         raise NotImplementedError()
+
+    def is_active_token(self, token: str) -> bool:
+        raise NotImplementedError()
+
+    def revoke_token(self, token: str) -> None:
+        raise NotImplementedError()

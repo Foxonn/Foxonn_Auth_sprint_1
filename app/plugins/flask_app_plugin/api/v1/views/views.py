@@ -1,5 +1,3 @@
-import typing as t
-
 import orjson
 from flask import Flask
 from flask import request
@@ -13,13 +11,19 @@ from app.functions.query.interfaces import IGetHistoryLoginQuery
 from app.functions.query.interfaces import IIdentificationUserQuery
 from app.models.auth_models import RegistrationRequestModel
 from app.plugins.flask_app_plugin.events import LoginEvent
+from app.plugins.flask_app_plugin.exceptions import BearerTokenNotFoundError
+from app.plugins.flask_app_plugin.exceptions import FingerprintIsNotValidateError
 from app.plugins.flask_app_plugin.utils.fingerprint import fingerprint_encode
 from app.plugins.flask_app_plugin.utils.get_token_session import get_token_session
 from app.plugins.flask_app_plugin.utils.make_json_response import make_json_response
-from app.plugins.flask_app_plugin.utils.required_auth import required_auth
+from app.plugins.flask_app_plugin.utils.required_auth import required_auth_decorator
+from app.plugins.flask_app_plugin.utils.required_auth import validation_fingerprint_decorator
+from app.plugins.flask_app_plugin.utils.required_auth import validation_token_and_fingerprint
+from app.plugins.flask_app_plugin.utils.revoke_refresh_token import logout_cmd
 from app.plugins.jwt_token_plugin.functions.commands.interfaces import ICreateAccessTokenCmd
 from app.plugins.jwt_token_plugin.functions.commands.interfaces import ICreateRefreshTokenCmd
 from app.plugins.jwt_token_plugin.functions.commands.interfaces import IDecodeJWTTokenCmd
+from app.plugins.session_auth_storage_plugin.core import IPairsTokenStorage
 from app.plugins.session_auth_storage_plugin.core import ISessionStorage
 from app.utils.ioc import ioc
 from app.utils.message_bus import message_bus
@@ -28,15 +32,16 @@ __all__ = [
     'init_views',
 ]
 
+get_session_storage = ioc.get_object(object_type=ISessionStorage)
+get_pairs_token_storage = ioc.get_object(object_type=IPairsTokenStorage)
+identification_user_query = ioc.get_function(function_type=IIdentificationUserQuery)
+create_access_token_cmd = ioc.get_function(function_type=ICreateAccessTokenCmd)
+create_refresh_token_cmd = ioc.get_function(function_type=ICreateRefreshTokenCmd)
+decode_jwt_token_cmd = ioc.get_function(function_type=IDecodeJWTTokenCmd)
+get_history_login_query = ioc.get_function(function_type=IGetHistoryLoginQuery)
 
-def init_views(app: Flask) -> None:
-    session_storage = ioc.get_object(object_type=ISessionStorage)()
-    identification_user_query = ioc.get_function(function_type=IIdentificationUserQuery)
-    create_access_token_cmd = ioc.get_function(function_type=ICreateAccessTokenCmd)
-    create_refresh_token_cmd = ioc.get_function(function_type=ICreateRefreshTokenCmd)
-    decode_jwt_token_cmd = ioc.get_function(function_type=IDecodeJWTTokenCmd)
-    get_history_login_query = ioc.get_function(function_type=IGetHistoryLoginQuery)
 
+def init_views(app: Flask) -> Response:
     @app.route('/registration', methods=["POST"])
     async def registration() -> Response:
         create_user = ioc.get_function(function_type=ICreateUserCmd)
@@ -47,11 +52,14 @@ def init_views(app: Flask) -> None:
                 await create_user(data=data.dict())
         except BaseException as err:
             return make_json_response(response=orjson.dumps({'error': str(err)}), status=500)
-        return make_json_response(response='', status=200)
+        return make_json_response(status=201)
 
     @app.route('/login', methods=["POST"])
     async def login() -> Response:
+        session_storage = get_session_storage()
+        pairs_token_storage = get_pairs_token_storage()
         fingerprint = fingerprint_encode()
+
         await message_bus.publish(
             event=LoginEvent(
                 login=request.args['login'],
@@ -66,9 +74,12 @@ def init_views(app: Flask) -> None:
             except UserNotFoundError as err:
                 return make_json_response(response=str(err), status=404)
             else:
-                access_token = create_access_token_cmd(payload=identity)
                 refresh_token = create_refresh_token_cmd(payload=identity)
+                access_token = create_access_token_cmd(payload=identity)
+
                 session_storage.set(jwt_token=access_token)
+                session_storage.set(jwt_token=refresh_token)
+                pairs_token_storage.set(access_token=access_token, refresh_token=refresh_token)
 
                 return make_json_response(
                     response=orjson.dumps({
@@ -80,17 +91,6 @@ def init_views(app: Flask) -> None:
 
     @app.route('/refresh/<refresh_token>', methods=["GET"])
     async def refresh(refresh_token: str) -> Response:
-        try:
-            token = decode_jwt_token_cmd(token=refresh_token)
-        except ExpiredSignatureError as err:
-            return make_json_response(response=orjson.dumps({'error': f'Refresh token. {err}'}), status=401)
-        except Exception as err:
-            return make_json_response(response=orjson.dumps({'error': str(err)}), status=500)
-        else:
-            access_token = create_access_token_cmd(payload=token.payload.dict())
-            refresh_token = create_refresh_token_cmd(payload=token.payload.dict())
-
-        session_storage.set(jwt_token=access_token)
         return make_json_response(
             response=orjson.dumps({
                 'access_token': access_token.token,
@@ -99,16 +99,21 @@ def init_views(app: Flask) -> None:
             status=200,
         )
 
-    @app.route('/logout', methods=["POST"])
-    async def logout() -> t.Mapping[str, t.Any]:
-        ...
+    @app.route('/logout', methods=["GET"])
+    async def logout() -> Response:
+        try:
+            token = get_token_session()
+            logout_cmd(token=token.token)
+        except BearerTokenNotFoundError as err:
+            return make_json_response(response=orjson.dumps({'error': str(err)}), status=403)
+        else:
+            return make_json_response(status=200)
 
     @app.route('/history_login', methods=["GET"])
-    @required_auth
     async def history_login() -> Response:
-        token = get_token_session()
-        result = await get_history_login_query(user_id=token.payload.user_id)
         try:
+            token = get_token_session()
+            result = await get_history_login_query(user_id=token.payload.user_id)
             return make_json_response(response=orjson.dumps(result), status=200)
         except BaseException as err:
             return make_json_response(response=orjson.dumps({'error': str(err)}), status=500)

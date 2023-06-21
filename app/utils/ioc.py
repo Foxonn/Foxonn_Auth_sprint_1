@@ -25,14 +25,17 @@ class IOC:
         self.__objects_store[object_type] = call
 
     def get_object(self, object_type: t.Type[T]) -> t.Callable[[None], T] | None:
-        return self.__objects_store[object_type]
+        def call() -> t.Callable:
+            return self.__objects_store[object_type]()
+        return call
 
     def set_function(self, function_type: t.Type[T], function: T) -> None:
         self.__functions_store[function_type] = function.__call__
 
     def get_function(self, function_type: t.Type[T]) -> T:
-        function = self.__functions_store[function_type]
-        return function
+        def call(*args, **kwargs) -> t.Callable:
+            return self.__functions_store[function_type](*args, **kwargs)
+        return call
 
 
 ioc = IOC()
