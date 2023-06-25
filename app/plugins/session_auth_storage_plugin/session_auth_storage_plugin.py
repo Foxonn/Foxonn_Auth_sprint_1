@@ -2,16 +2,13 @@ import typing as t
 
 from pydantic import BaseModel
 
-from app.plugins.session_auth_storage_plugin.core import IPairsTokenStorage
 from app.plugins.session_auth_storage_plugin.core import ISessionStorage
-from app.plugins.session_auth_storage_plugin.impl import MemoryPairsTokenStorage
 from app.plugins.session_auth_storage_plugin.impl import MemorySessionStorage
 from app.utils.ioc import ioc
 from app.utils.plugins_manager import IPlugin
+from app.utils.plugins_manager import plugins_manager
 
 __all__ = ['SessionAuthStoragePlugin']
-
-from app.utils.plugins_manager import plugins_manager
 
 
 class PluginSettings(BaseModel):
@@ -27,8 +24,9 @@ class SessionAuthStoragePlugin(IPlugin):
 
     async def load(self, plugins_settings: t.Mapping[str, t.Any] | None = None) -> None:
         config_plugin = PluginSettings(**plugins_settings)
-        ioc.set_object(object_type=ISessionStorage, object_=MemorySessionStorage())
-        ioc.set_object(object_type=IPairsTokenStorage, object_=MemoryPairsTokenStorage())
+        memory_session_storage = MemorySessionStorage()
+
+        ioc.set_object(object_type=ISessionStorage, object_=memory_session_storage)
 
     async def reload(self) -> None:
         pass

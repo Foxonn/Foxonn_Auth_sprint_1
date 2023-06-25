@@ -20,11 +20,3 @@ class MemorySessionStorage(ISessionStorage):
     def get(self, token: str) -> JWTTokenModels:
         raw_data = orjson.loads(self._store[token])
         return JWTTokenModels(**raw_data)
-
-    def is_active_token(self, token: str) -> bool:
-        if token in self._store:
-            return True
-        return False
-
-    def revoke_token(self, token: str) -> None:
-        self._store.pop(token)

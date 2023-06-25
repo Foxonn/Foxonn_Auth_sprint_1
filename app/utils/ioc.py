@@ -19,37 +19,23 @@ class IOC:
         self.__functions_store: t.Dict[t.Type, t.Callable] = dict()
 
     def set_object(self, object_type: t.Type[T], object_: T) -> None:
-        def call() -> T:
+        def _() -> T:
             return object_
 
-        self.__objects_store[object_type] = call
+        self.__objects_store[object_type] = _
 
-    def get_object(self, object_type: t.Type[T]) -> t.Callable[[None], T] | None:
-        def call() -> t.Callable:
+    def get_object(self, object_type: t.Type[T]) -> t.Callable[[None], T]:
+        def _() -> t.Callable:
             return self.__objects_store[object_type]()
-        return call
+        return _
 
     def set_function(self, function_type: t.Type[T], function: T) -> None:
         self.__functions_store[function_type] = function.__call__
 
     def get_function(self, function_type: t.Type[T]) -> T:
-        def call(*args, **kwargs) -> t.Callable:
+        def _(*args, **kwargs) -> t.Callable:
             return self.__functions_store[function_type](*args, **kwargs)
-        return call
+        return _
 
 
 ioc = IOC()
-
-
-if __name__ == '__main__':
-
-    class A:
-        def __call__(self, msg: str) -> str:
-            return msg
-
-    ioc = IOC()
-    ioc.set_function(function_type=A, function=A())
-    func = ioc.get_function(function_type=A)
-    print('\n'+'*'*30)
-    print(*[func(123123123)], sep='\n\r')
-    print('*'*30+'\n')

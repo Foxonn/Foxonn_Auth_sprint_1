@@ -1,9 +1,9 @@
-from app.utils.message_bus import EventModel
+from pydantic import BaseModel
 
 __all__ = ['LoginEvent']
 
 
-class LoginEvent(EventModel):
+class LoginEvent(BaseModel):
     login: str
     password: str
     fingerprint: bytes

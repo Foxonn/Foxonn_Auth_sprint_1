@@ -4,12 +4,12 @@ from app.functions.commands.interfaces import ICreateHistoryLoginCmd
 from app.functions.query.interfaces import IIdentificationUserQuery
 from app.models.auth_models import LoginRequestModel
 from app.plugins.flask_app_plugin.events.login_event import LoginEvent
-from app.utils.message_bus import EventHandler
+from app.utils.event_bus import EventHandler
 
 __all__ = ['CreateHistoryLoginEventHandler']
 
 
-class CreateHistoryLoginEventHandler(EventHandler):
+class CreateHistoryLoginEventHandler(EventHandler[LoginEvent]):
     __slots__ = (
         '_identification_user_query',
         '_create_history_login_cmd',

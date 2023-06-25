@@ -1,4 +1,5 @@
 import typing as t
+
 from flask import Response
 
 __all__ = ['make_json_response']
